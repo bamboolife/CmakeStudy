@@ -297,7 +297,3 @@ target_link_libraries(  hello-jni Test )
 
 6.0以上 System.loadLibrary 会自动为我们加载依赖的动态库
 
-作者：narutolufi
-链接：https://www.jianshu.com/p/fd9b0922a56c
-来源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。

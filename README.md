@@ -297,3 +297,113 @@ target_link_libraries(  hello-jni Test )
 
 6.0以上 System.loadLibrary 会自动为我们加载依赖的动态库
 
+目前 Android Studio 默认支持的 CMake 最新版本是 3.10.2，但是这个版本 message 输出根本看不到。记得之前 3.6.x 版本中 build 之后还是可以看到的，这篇文章主要说下 message() 的使用和日志输出位置。
+
+一、CMake 命令 message
+
+CMake 如果要像用户展示消息需要可以使用 message() API，类似与 Android 中的 Log 输出。
+
+message([<mode>] "message to display" ...)
+<mode>关键字，可以指定消息的类型：
+
+(none)         = 重要消息
+STATUS         = 附带消息
+WARNING        = CMake警告，继续处理
+AUTHOR_WARNING = CMake警告（dev），继续处理
+SEND_ERROR     = CMake错误，继续处理，但跳过生成
+FATAL_ERROR    = CMake错误，停止处理和生成
+DEPRECATION    = 如果分别启用了变量CMAKE_ERROR_DEPRECATED或CMAKE_WARN_DEPRECATED，则CMake弃用错误或警告，否则无消息
+二、使用示例
+
+简单演示上面前三种，打印一些变量值：
+
+message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+message(STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}")
+message(WARNING "CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}")
+打印结果：
+
+CMAKE_SOURCE_DIR = /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp
+PROJECT_SOURCE_DIR = /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp
+CMake Warning at /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp/CMakeLists.txt:15 (message):
+  CMAKE_BINARY_DIR =
+  /Users/ff/Develop/AndroidStudioProjects/NDK/app/.externalNativeBuild/cmake/debug/armeabi-v7a
+可以看到 (none) 和 STATUS 输出没有区别的；
+WARNING 会打印出 CMakeLists.txt 目录以及 行号，后面才是我们打印的内容。
+
+三、message 输出
+
+这里就要注意了，3.6 版本和 3.8 版本输出的位置不一样，赶时间可以跳过直接看下面的兼容方案。
+
+CMake 3.6 版本
+
+方式一：
+
+使用 Gradle build
+
+build
+Run 中查看编译日志
+
+日志输出
+方式二：
+
+直接 build
+
+image.png
+Build中查看编译日志
+
+
+
+image.png
+注意：build 第一次会执行编译，之后不再修改 CMakeLists.txt 中的内容，再次 build，CMake 是不会重新编译的，需要修改一下 CMakeLists.txt ，比如加个空格之类的，或者将 app/.externalNativeBuild 文件夹删掉，也可以重新编译。
+
+CMake 3.8 版本
+
+还是使用上面方式 build 后查看 Run 中的编译日志：
+
+
+日志输出
+我们会发现 (none) 和 STATUS 的 message 不会没有打印，项目开发中，我在这里被坑了，开始以为是 API 改变了，查了很多文档也没有说明，直到尝试使用 WARNING 级别，才发现问题的所在。
+
+在 3.8 版本 (none) 和 STATUS 两种级别的 message 不会直接打印出来，有两种解决办法：
+
+方式一：
+如果想直接看到打印信息，使用 WARNING 以上的级别进行打印。
+
+方式二：
+就是下面的兼容方案，推荐使用，可以兼容 CMake 所有版本。
+
+四、兼容方案
+
+其实，输出内容 CMake 会保存到文本中，包括前面的 3.6 版本，目录是：
+
+$your-proj/$your-module/.externalNativeBuild/cmake/debug/$ARCH/cmake_build_output.txt
+$your-module 默认是"app"，根据项目不同，可能不一样。
+$ARCH 是 CPU 类型（armeabi-v7a，arm64-v8a，x86等） 。
+例如我的路径为：
+
+
+cmake_build_output.txt
+cmake_build_output.txt 中的日志输出内容：
+
+Check for working C compiler: /Users/ff/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang
+Check for working C compiler: /Users/ff/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang -- works
+Detecting C compiler ABI info
+Detecting C compiler ABI info - done
+Detecting C compile features
+Detecting C compile features - done
+Check for working CXX compiler: /Users/ff/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++
+Check for working CXX compiler: /Users/ff/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ -- works
+Detecting CXX compiler ABI info
+Detecting CXX compiler ABI info - done
+Detecting CXX compile features
+Detecting CXX compile features - done
+CMAKE_SOURCE_DIR = /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp
+PROJECT_SOURCE_DIR = /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp
+CMake Warning at /Users/ff/Develop/AndroidStudioProjects/NDK/app/src/main/cpp/CMakeLists.txt:15 (message):
+  CMAKE_BINARY_DIR =
+  /Users/ff/Develop/AndroidStudioProjects/NDK/app/.externalNativeBuild/cmake/debug/arm64-v8a
+
+
+Configuring done
+
+

@@ -15,7 +15,13 @@
 |   类型   |      值 |
 |:------- |:-------- |
 | true    | 1，ON，YES，TRUE，Y，非0的值 |
-| false   | 0，OFF，NO，FALSE,N,IGNORE,NOTFOUND,空字符串，以-NOTFOUND结尾的字符串 |
+| false   | 0，OFF，NO，FALSE,N,IGNORE,NOTFOUND,<br>空字符串，以-NOTFOUND结尾的字符串 |
+## CMake流程控制-操作符
+|   类型   |      值 |
+|:------- |:-------- |
+| 一元   | EXIST,COMMAND,DEFINED |
+| 二元    | EQUAL,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,<br>STREQUAL,STRLESS,STRLESS_EQUAL,STRGREATER,<br>STRGREATER_EQUAL,VERSION_EQUAL,VERSION_LESS,<br>VERSION_LESS_EQUAL,VERSION_GREATER,VERSION_GREATER_EQUAL,MATCHES |
+
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

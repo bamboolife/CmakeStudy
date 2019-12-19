@@ -11,18 +11,6 @@
 - 以CMake编写的源文件以CMakeLists.txt命名或以.cmake为扩展名。
 - 可以通过add_subdirectory()命令把子目录的CMake源文件添加进来。
 - CMake源文件中所有的语句都是命令，可以是内置命令或自定义的函数/宏命令
-## CMake流程控制-布尔常量
-|   类型   |      值 |
-|:------- |:-------- |
-| true    | 1，ON，YES，TRUE，Y，非0的值 |
-| false   | 0，OFF，NO，FALSE,N,IGNORE,NOTFOUND,<br>空字符串，以-NOTFOUND结尾的字符串 |
-## CMake流程控制-操作符
-|   类型   |      值 |
-|:------- |:-------- |
-| 一元   | EXIST,COMMAND,DEFINED |
-| 二元    | EQUAL,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,<br>STREQUAL,STRLESS,STRLESS_EQUAL,STRGREATER,<br>STRGREATER_EQUAL,VERSION_EQUAL,VERSION_LESS,<br>VERSION_LESS_EQUAL,VERSION_GREATER,VERSION_GREATER_EQUAL,MATCHES |
-| 逻辑   | NOT,AND,OR |
-
 ## CMake变量
 - CMake中所有变量都是string类型。可以使用set()和unset()命令来声明或者移除一个变量
 - 变量的引用：${变量名}
@@ -39,7 +27,7 @@ MESSAGE("var=${var}")
 - 函数层：在命令函数中定义的变量，属于函数作用域内的变量。
 ## CMake列表（lists）
 - 列表也是字符串，可以把列表看做一个特殊的变量，这个变量有多个值。
-- 语法格式：SET(列表名 值1值2...值N)或者SET(列表名 “值1;值2；...值N”)
+- 语法格式：SET(列表名 值1 值2... 值N)或者SET(列表名 “值1;值2；...值N”)
 - 列表的引用 ${列表名}
 ```
 #SET(列表名 值1 值2... 值N)
@@ -49,6 +37,22 @@ SET(list_var 1 3 5 7)
 SET(list_var "1;3;5;7")
 MESSAGE("list_var=${list_var}")
 ```
+## CMake流程控制-布尔常量
+|   类型   |      值 |
+|:------- |:-------- |
+| true    | 1，ON，YES，TRUE，Y，非0的值 |
+| false   | 0，OFF，NO，FALSE,N,IGNORE,NOTFOUND,<br>空字符串，以-NOTFOUND结尾的字符串 |
+## CMake流程控制-操作符
+|   类型   |      值 |
+|:------- |:-------- |
+| 一元   | EXIST,COMMAND,DEFINED |
+| 二元    | EQUAL,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,<br>STREQUAL,STRLESS,STRLESS_EQUAL,STRGREATER,<br>STRGREATER_EQUAL,VERSION_EQUAL,VERSION_LESS,<br>VERSION_LESS_EQUAL,VERSION_GREATER,VERSION_GREATER_EQUAL,MATCHES |
+| 逻辑   | NOT,AND,OR |
+
+## CMake流程控制-循环遍历
+### 循环遍历一
+- 语法格式：<br>foreach(循环变量 参数1 参数2 ... 参数n)<br> COMMAND(ARGS ...)<br>endforeach(循环变量)
+
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

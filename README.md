@@ -59,7 +59,7 @@ FOREACH(item 2 4 6)
     MESSAGE("item=${item}")
 ENDFOREACH(item)    
 ```
-### 循环编译二
+### 循环遍历二
 - 语法格式：<br>foreach(循环变量 RANGE total)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
 - 循环范围从0到total。
 ```
@@ -67,7 +67,7 @@ FOREACH(item RANGE 6)
     MESSAGE("item=${item}")
 ENDFOREACH(item)    
 ```
-### 循环编译三
+### 循环遍历三
 - 语法格式：<br>foreach(循环变量 RANGE start stop step)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
 - 循环范围从start到stop,循环增量为step。
 ```
@@ -75,7 +75,7 @@ FOREACH(item RANGE 1 6 2)
     MESSAGE("item=${item}")
 ENDFOREACH(item)    
 ```
-### 循环编译四
+### 循环遍历四
 - foreach还支持对列表的循环。
 - 语法格式：<br>foreach(循环变量 IN LISTS 列表)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
 ```
@@ -85,8 +85,63 @@ FOREACH(item IN LISTS list_var)
 ENDFOREACH(item)    
 ```
 ## CMake自定义函数命令
-- 自定义函数命令格式：
-
+- 自定义函数命令格式：<br>function(<name>[arg1[arg2[arg3...]]])<br>COMMAND()<br>endfunction(<name>)
+- 函数命令调用调用格式：<br> name(实参列表)    
+```
+   FUNCTION(func x y z)
+    MESSAHE("call function func")
+    MESSAGE("x=${x}")
+    MESSAGE("y=${y}")
+    MESSAGE("z=${z}")
+    MESSAGE("ARGC = ${ARGC}")
+    MESSAGE("arg1= ${ARGV0}" arg2= ${ARGV1} arg3= ${ARGV2})
+    MESSAGE("all args=${ARGV}")
+   ENDFUNCTION(func)
+   
+   func(2,5,7)
+```    
+## CMake自定义宏命令
+- 自定义宏命令格式：<br>macro(<name>[arg1[arg2[arg3...]]])<br>COMMAND()<br>endmacro(<name>)
+- 宏命令调用格式：<br> name(实参列表)
+```
+   MACRO(ma x y z)
+    MESSAHE("call macro ma")
+    MESSAGE("x=${x}")
+    MESSAGE("y=${y}")
+    MESSAGE("z=${z}")
+   ENDMOCRO(ma)
+   
+   ma(2,5,7)
+``` 
+## 常用命令
+### 常用命令-AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+```
+ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+```
+- 查找当前目录所有源文件 并将源文件名称列表保存到 DIR_DRCS变量中
+- 不能查找子目录
+### 常用命令add_library
+添加一个库
+- 添加一个库文件，名为<name>
+- 指定STATIC,SHARED,MODULE参数来指定库的类型。STATIC：静态库；SHARED:动态库；<br>MODULE:在使用dyld的系统有效，若不支持dydld,等同于SHARED.
+- EXCLUED_FROM_ALL:表示该库不会被默认构建。
+- source1 source2 ... sourceN:用来指定库的源文件
+```
+add_library(<name> [STATIC | SHARED | MODULE] [EXCLUED_FORM_ALL] source1 source2 ... sourceN)
+```
+导入预编译库
+- 添加一个已存在的与编译库，名为<name>
+- 一般配合set_target_properties使用
+```
+add_library(<name> [STATIC | SHARED | MODULE|UNKNOWN] IMPORTED)
+#比如
+add_library(test SHARED IMPORTED)
+set_target_properties(
+    test  #指明目标库名
+    PROPERTIES IMPORTED_LOCATION #指明要设置的参数
+    库路径/${ANDROID_ABI}/libtest.so #导入库的路径
+    )    
+```
 
 #cmake最低版本
 

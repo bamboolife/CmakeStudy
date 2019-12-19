@@ -51,7 +51,42 @@ MESSAGE("list_var=${list_var}")
 
 ## CMake流程控制-循环遍历
 ### 循环遍历一
-- 语法格式：<br>foreach(循环变量 参数1 参数2 ... 参数n)<br> COMMAND(ARGS ...)<br>endforeach(循环变量)
+- 语法格式：<br>foreach(循环变量 参数1 参数2 ... 参数n)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
+- 每次迭代设置循环变量为参数。
+- foreach也支持breack()和continue()命令跳出循环。
+```
+FOREACH(item 2 4 6)
+    MESSAGE("item=${item}")
+ENDFOREACH(item)    
+```
+### 循环编译二
+- 语法格式：<br>foreach(循环变量 RANGE total)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
+- 循环范围从0到total。
+```
+FOREACH(item RANGE 6)
+    MESSAGE("item=${item}")
+ENDFOREACH(item)    
+```
+### 循环编译三
+- 语法格式：<br>foreach(循环变量 RANGE start stop step)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
+- 循环范围从start到stop,循环增量为step。
+```
+FOREACH(item RANGE 1 6 2)
+    MESSAGE("item=${item}")
+ENDFOREACH(item)    
+```
+### 循环编译四
+- foreach还支持对列表的循环。
+- 语法格式：<br>foreach(循环变量 IN LISTS 列表)<br>     COMMAND(ARGS ...)<br>endforeach(循环变量)
+```
+SET(list_var 1 2 3)
+FOREACH(item IN LISTS list_var)
+    MESSAGE("item=${item}")
+ENDFOREACH(item)    
+```
+## CMake自定义函数命令
+- 自定义函数命令格式：
+
 
 #cmake最低版本
 

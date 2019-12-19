@@ -33,11 +33,22 @@ SET(var 666)
 MESSAGE("var=${var}")
 ```
 
-##CMake变量的作用域
+## CMake变量的作用域
 - 全局层：cache变量，在整个项目范围内，一般在SET定义变量时，指定CACHE参数就能定义为cache变量。
 - 目录层：在当前目录CMakeLists.txt中定义，以及在该文件包含的其它cmake源文件中定义的变量。
 - 函数层：在命令函数中定义的变量，属于函数作用域内的变量。
-
+## CMake列表（lists）
+- 列表也是字符串，可以把列表看做一个特殊的变量，这个变量有多个值。
+- 语法格式：SET(列表名 值1值2...值N)或者SET(列表名 “值1;值2；...值N”)
+- 列表的引用 ${列表名}
+```
+#SET(列表名 值1 值2... 值N)
+#或者SET(列表名 “值1;值2；...值N”)
+SET(list_var 1 3 5 7)
+#或
+SET(list_var "1;3;5;7")
+MESSAGE("list_var=${list_var}")
+```
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

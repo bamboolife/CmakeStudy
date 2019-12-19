@@ -21,7 +21,17 @@
 |:------- |:-------- |
 | 一元   | EXIST,COMMAND,DEFINED |
 | 二元    | EQUAL,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,<br>STREQUAL,STRLESS,STRLESS_EQUAL,STRGREATER,<br>STRGREATER_EQUAL,VERSION_EQUAL,VERSION_LESS,<br>VERSION_LESS_EQUAL,VERSION_GREATER,VERSION_GREATER_EQUAL,MATCHES |
+| 逻辑   | NOT,AND,OR |
 
+##CMake变量
+- CMake中所有变量都是string类型。可以使用set()和unset()命令来声明或者移除一个变量
+- 变量的引用：${变量名}
+```
+#声明变量：SET(变量名  变量值)
+SET(var 666)
+#引用变量 message命令用来打印
+MESSAGE("var=${var}")
+```
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

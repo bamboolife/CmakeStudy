@@ -6,7 +6,7 @@
 
 - CMake是一个比make更高级的编译配置工具，它可以根据不同平台、不同的编译器，生成相应的Makefile或者vcproj项目。从而达到跨平台的目的。Android Studio利用CMake生成的是ninja，ninja是一个小型的关注速度的构建系统。我们不需要关心ninja的脚本，知道怎么配置cmake就可以了。从而可以看出cmake其实是一个跨平台的支持产出各种不同的构建脚本的一个工具。
 
-##CMake源文件
+## CMake源文件
 - CMake的源码文件可以包含命令、注释、空格、和换行。
 - 以CMake编写的源文件以CMakeLists.txt命名或以.cmake为扩展名。
 - 可以通过add_subdirectory()命令把子目录的CMake源文件添加进来。

@@ -23,7 +23,7 @@
 | 二元    | EQUAL,LESS,LESS_EQUAL,GREATER,GREATER_EQUAL,<br>STREQUAL,STRLESS,STRLESS_EQUAL,STRGREATER,<br>STRGREATER_EQUAL,VERSION_EQUAL,VERSION_LESS,<br>VERSION_LESS_EQUAL,VERSION_GREATER,VERSION_GREATER_EQUAL,MATCHES |
 | 逻辑   | NOT,AND,OR |
 
-##CMake变量
+## CMake变量
 - CMake中所有变量都是string类型。可以使用set()和unset()命令来声明或者移除一个变量
 - 变量的引用：${变量名}
 ```
@@ -32,6 +32,12 @@ SET(var 666)
 #引用变量 message命令用来打印
 MESSAGE("var=${var}")
 ```
+
+##CMake变量的作用域
+- 全局层：cache变量，在整个项目范围内，一般在SET定义变量时，指定CACHE参数就能定义为cache变量。
+- 目录层：在当前目录CMakeLists.txt中定义，以及在该文件包含的其它cmake源文件中定义的变量。
+- 函数层：在命令函数中定义的变量，属于函数作用域内的变量。
+
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

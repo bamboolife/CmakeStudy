@@ -11,7 +11,11 @@
 - 以CMake编写的源文件以CMakeLists.txt命名或以.cmake为扩展名。
 - 可以通过add_subdirectory()命令把子目录的CMake源文件添加进来。
 - CMake源文件中所有的语句都是命令，可以是内置命令或自定义的函数/宏命令
-
+## CMake流程控制-布尔常量
+|   类型   |      值 |
+|:------- |:-------- |
+| true    | 1，ON，YES，TRUE，Y，非0的值 |
+| false   | 0，OFF，NO，FALSE,N,IGNORE,NOTFOUND,空字符串，以-NOTFOUND结尾的字符串 |
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

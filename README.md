@@ -1,5 +1,5 @@
 # CmakeStudy
-##什么是CMake
+## 什么是CMake
 在android studio 2.2及以上，构建原生库的默认工具是 CMake。
 
 ​ CMake是一个跨平台的构建工具，可以用简单的语句来描述所有平台的安装(编译过程)。能够输出各种各样的makefile或者project文件。Cmake 并不直接建构出最终的软件，而是产生其他工具的脚本（如Makefile ），然后再依这个工具的构建方式使用。

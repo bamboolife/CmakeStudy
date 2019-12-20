@@ -125,9 +125,11 @@ ENDFOREACH(item)
 
 - 查找当前目录所有源文件 并将源文件名称列表保存到 DIR_DRCS变量中
 - 不能查找子目录
+
 ### 常用命令add_library
+
 添加一个库
-- 添加一个库文件，名为<name>
+- 添加一个库文件，名为`<name>`
 - 指定STATIC,SHARED,MODULE参数来指定库的类型。STATIC：静态库；SHARED:动态库；<br>MODULE:在使用dyld的系统有效，若不支持dydld,等同于SHARED.
 - EXCLUED_FROM_ALL:表示该库不会被默认构建。
 - source1 source2 ... sourceN:用来指定库的源文件
@@ -139,7 +141,7 @@ add_library(hello SHARED hello.cpp)
 ```
     
 导入预编译库
-- 添加一个已存在的与编译库，名为<name>
+- 添加一个已存在的与编译库，名为`<name>`
 - 一般配合set_target_properties使用
     
 ```

@@ -237,7 +237,37 @@ file(TO_NATIVE_PATH path result)
 file(GLOB variable [RELATIVE path] [globbing expressions]....)
 
 ```
+### 常用命令-set_directory_properties
+```
+set_directory_properties(PROPERTIES prop1 value1 prop2 value2)
+```
+- 设置某个路径的一种属性
+- prop1,prop2代表属性，取值为：
+<br> INCLUDE_DIRECTORIES
+<br> LINK_DIRECTORIES
+<br> INCLUDE_PEGULAR_EXPRESSION
+<br> ADDITIONAL_MAKE_CLEAN_FILES
 
+### 常用命令-set_property
+```
+ set_property(<GLOBAL |
+                DIRECTORY [dir] |
+                TARGET[target ...]> |
+                SOURCE [src1 ....] |
+                TEST [test1 ...]) |
+                CACHE [ENTRY1 ...]>
+                [APPEND]
+                PROPERTY <name> [value ...])
+                
+```
+- 在给定的作用域内设置一个命名的属性
+- PROPERTY参数是必须的
+- 第一个参数决定了属性可以影响的作用域：
+  <br>GLOBAL:全局作用域
+  <br>DIRECTORY:默认当前路径，也可以用[dir] 指定路径
+  <br>TARGET:目标作用域，可以是0个或多个已有目标
+  <br>SOURCE:源文件作用域，可以是0个或多个源文件
+ 
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

@@ -145,9 +145,9 @@ set_target_properties(
 ### 常用命令-SET
   - 设置CMake变量
 ```
-   #设置可执行文件的输出路径（EXCUTABLE_OUTPUT_PATH是全局变量）
+    #设置可执行文件的输出路径（EXCUTABLE_OUTPUT_PATH是全局变量）
     SET(EXCUTABLE_OUTPUT_PATH [out_path])
-   #设置库文件的输出路径(LIBRARY_OUTPUT_PATH是全局变量)
+    #设置库文件的输出路径(LIBRARY_OUTPUT_PATH是全局变量)
     SET(LIBRARY_OUTPUT_PATH [output_path])
     #设置c++编译参数(CMAKE_CXX_FLAGS是全局变量)
     SET(CMAKE_CXX_FLAGS "-Wall std=c++11")
@@ -163,9 +163,9 @@ set_target_properties(
 ```    
 ### 常用命令-add_executable
     - 添加可执行文件
-    ```
-    add_executable(<name>)
-    ```
+```
+    add_executable(<name> ${SRC_LIST})
+```
     
     
 #cmake最低版本

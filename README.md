@@ -264,11 +264,29 @@ set_directory_properties(PROPERTIES prop1 value1 prop2 value2)
 - PROPERTY参数是必须的
 - 第一个参数决定了属性可以影响的作用域：
   <br>GLOBAL:全局作用域
-  <br>DIRECTORY:默认当前路径，也可以用[ dir ] 指定路径
+  <br>DIRECTORY:默认当前路径，也可以用`[dir]` 指定路径
   <br>TARGET:目标作用域，可以是0个或多个已有目标
   <br>SOURCE:源文件作用域，可以是0个或多个源文件
   <br>TEST:测试作用域，可以是0个或多个源文件
-### 多个源文件  
+  <br>CACHE:必须指定0个或多个cache中已有的条目
+### 多个源文件处理
+- 如果源文件很多，把所有文件一个个加入很麻烦，可以使用aux_source_directory命令或file命令，会查找指定目录下的所有源文件，然后将结果存进指定变量名
+```
+#cmake最低版本
+cmake_minimum_required(VERSION 3.6.0)
+# 查找当前目录所有源文件 并将名称保存到 DIR_SRCS变量
+# 不能查找子目录
+aux_source_directory(. DIR_SRCS)
+# 也可以使用
+# file(GLOB DIR_SRCS *.c *.cpp)
+
+add_library(
+     native-lib
+     SHARED
+     ${DIR_SRCS})
+```
+### 多目录多源文件处理
+
 
 #cmake最低版本
 

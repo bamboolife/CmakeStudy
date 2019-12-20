@@ -99,10 +99,12 @@ ENDFOREACH(item)
    ENDFUNCTION(func)
    
    func(2,5,7)
-```    
+```  
+
 ## CMake自定义宏命令
 - 自定义宏命令格式：<br>macro(<name>[arg1[arg2[arg3...]]])<br>COMMAND()<br>endmacro(<name>)
 - 宏命令调用格式：<br> name(实参列表)
+
 ```
    MACRO(ma x y z)
     MESSAHE("call macro ma")
@@ -113,11 +115,14 @@ ENDFOREACH(item)
    
    ma(2,5,7)
 ``` 
+
 ## 常用命令
 ### 常用命令-AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+
 ```
  AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 ```
+
 - 查找当前目录所有源文件 并将源文件名称列表保存到 DIR_DRCS变量中
 - 不能查找子目录
 ### 常用命令add_library
@@ -126,12 +131,17 @@ ENDFOREACH(item)
 - 指定STATIC,SHARED,MODULE参数来指定库的类型。STATIC：静态库；SHARED:动态库；<br>MODULE:在使用dyld的系统有效，若不支持dydld,等同于SHARED.
 - EXCLUED_FROM_ALL:表示该库不会被默认构建。
 - source1 source2 ... sourceN:用来指定库的源文件
+
 ```
 add_library(<name> [STATIC | SHARED | MODULE] [EXCLUED_FORM_ALL] source1 source2 ... sourceN)
+#比如
+add_library(hello SHARED hello.cpp)    
 ```
+    
 导入预编译库
 - 添加一个已存在的与编译库，名为<name>
 - 一般配合set_target_properties使用
+    
 ```
 add_library(<name> [STATIC | SHARED | MODULE|UNKNOWN] IMPORTED)
 #比如
@@ -142,8 +152,10 @@ set_target_properties(
     库路径/${ANDROID_ABI}/libtest.so #导入库的路径
     )    
 ```
+
 ### 常用命令-SET
-  - 设置CMake变量
+- 设置CMake变量
+
 ```
     #设置可执行文件的输出路径（EXCUTABLE_OUTPUT_PATH是全局变量）
     SET(EXCUTABLE_OUTPUT_PATH [out_path])
@@ -154,20 +166,76 @@ set_target_properties(
     #设置源文件集合（SOURCE_FILES是本地变量即自定义变量）
     SET(SOURCE_FILES main.cpp test.cpp)
 ```    
+
 ### 常用命令-include_directories
-    - 设置头文件目录
-    - 相当于g++选项中的-l参数
+- 设置头文件目录
+- 相当于g++选项中的-l参数
+
 ```
    #可以用相对或绝对路径，也可以用自定义的变量值
    include_directories(./include ${MY_INCLUDE})  
-```    
+```   
+
 ### 常用命令-add_executable
-    - 添加可执行文件
+- 添加可执行文件
+
 ```
     add_executable(<name> ${SRC_LIST})
 ```
-    
-    
+
+### 常用命令-target_link_libraries
+- 将若干个库连接到目标文件
+- 链接的顺序应当符合gcc链接顺序规则，被连接的库放在依赖它的库的后面，即如果上面的命令中，lib1依赖于lib2，lib2又依赖于lib3，则在上面命令中必须严格按照lib1 lib2 lib3的顺序排列，否则会报错
+```
+格式 target_link_libraries(<name> lib1 lib2 lib3)
+#如果出现互相依赖的静态库，CMake会允许依赖图中包含循环依赖，如：
+    add_library（A STATIC a.c）
+    add_library（B STATIC b.c）
+    target_link_libraries(A B)
+    target_link_libraries(B A)
+    add_executable(main main.c)
+```
+### 常用命令-add_subdirectory
+- 如果当前目录下还有子目录是可以使用add_subdirectory，子目录中也需要包含有CMakeLists.txt
+
+```
+# sub_dir指定包含CMakeLists.txt和源文件的子目录位置
+# binary_dir是输出路径，一般可以不指定
+add_subdirectory(sub_dir [binary_dir])
+```
+### 常用命令-file
+- 文件操作命令
+```
+#将message写入filename文件中，会覆盖文件原有内容
+file(WRITE filename "message")
+# 将message写入filename文件中，会追加在文件末尾
+file(APPEND filename "message")
+#从filename文件中读取内容并存储到var变量中，如果指定了numBytes和offset，
+#则从offset处开始最多度numBytst个字节，另外如果指定了HEX参数，则内容会以十六进制形式存储在var变量中
+file(READ filename var [LIMIT numBytes] [OFFSET offset] [HEX])
+#重名名文件
+file(RENAME <oldname> <newname>)
+#删除文件，等于rm命令
+file(REMOVE [file1 ...])
+#递归的执行删除文件命令，等于rm -r
+file(REMOVE_RECURSE [file1 ...])
+#根据指定的url下载文件
+#timeout超时时间；下载的状态会保存到status中；下载日志会被保存到log；sum指定所下载文件预期的MD5值，如果指定会自动进行比对
+#如果不一致，则返回一个错误；SHOW_PROGRESS,进度信息会以状态信息的形式被打印出来
+file(DOWNLOAD url file [TIMEOUT timeout] [STATUS status] [LOG log] [EXPECTED_MD5 sum] [SHOW_PROGRESS])
+#创建目录
+file(MAKE_DIRECTORY [dir1 dir2 ...])
+#会把path转换为以unix的开头的cmake风格路径，保存在result中
+file(TO_CMAKE_PATH path result)
+#它会把cmake风格的路径转换为本地路径风格：windows下用“\”,而unix下用“/”
+file(TO_NATIVE_PATH path result)
+#将会为所有匹配查询表达式的文件生成一个list，并将该list存储进变量variable里，如果一个表达式指定了RELATIVE，返回的结果
+#将会是相对于给定路径的相对路径，查询表达式例子：*.cxx,*.vt?
+#NOTE:按照官方文档的说法，不建议使用file的GLOB指令来收集工程的源文件
+file(GLOB variable [RELATIVE path] [globbing expressions]....)
+
+```
+
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

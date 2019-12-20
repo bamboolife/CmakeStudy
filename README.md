@@ -142,7 +142,32 @@ set_target_properties(
     库路径/${ANDROID_ABI}/libtest.so #导入库的路径
     )    
 ```
-
+### 常用命令-SET
+  - 设置CMake变量
+```
+   #设置可执行文件的输出路径（EXCUTABLE_OUTPUT_PATH是全局变量）
+    SET(EXCUTABLE_OUTPUT_PATH [out_path])
+   #设置库文件的输出路径(LIBRARY_OUTPUT_PATH是全局变量)
+    SET(LIBRARY_OUTPUT_PATH [output_path])
+    #设置c++编译参数(CMAKE_CXX_FLAGS是全局变量)
+    SET(CMAKE_CXX_FLAGS "-Wall std=c++11")
+    #设置源文件集合（SOURCE_FILES是本地变量即自定义变量）
+    SET(SOURCE_FILES main.cpp test.cpp)
+```    
+### 常用命令-include_directories
+    - 设置头文件目录
+    - 相当于g++选项中的-l参数
+```
+   #可以用相对或绝对路径，也可以用自定义的变量值
+   include_directories(./include ${MY_INCLUDE})  
+```    
+### 常用命令-add_executable
+    - 添加可执行文件
+    ```
+    add_executable(<name>)
+    ```
+    
+    
 #cmake最低版本
 
 cmake_minimum_required(VERSION 3.6.0)

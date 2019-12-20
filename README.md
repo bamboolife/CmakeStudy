@@ -286,296 +286,118 @@ add_library(
      ${DIR_SRCS})
 ```
 ### 多目录多源文件处理
-
-
+- 主目录中的CMakeLists.txt添加add_subdirectory(child)命令，指明本地项目包含一个子项目child。并在target_link_libraries指明本项目需要链接一个名为child的库。
+- 子目录child中创建CMakeLists.txt，这里child编译为共享库。
+```
 #cmake最低版本
-
 cmake_minimum_required(VERSION 3.6.0)
-
-#指定项目
-
-project(Main)
-
-#生成可执行文件 main
-
-add_executable(main main.c)
-
-#执行cmake . 生成makefile
-
-#再执行make即可生成main程序
-
-如果源文件很多，那么一个个写进去是一件很麻烦的事情，这时候可以：
-
-
-cmake_minimum_required(VERSION 3.6.0)
-
-project(Main)
-
-#查找当前目录所有源文件 并将名称保存到 DIR_SRCS 变量
-
-#不能查找子目录
-
+# 查找当前目录所有源文件 并将名称保存到 DIR_SRCS变量
+# 不能查找子目录
 aux_source_directory(. DIR_SRCS)
-
-message(${DIR_SRCS})
-
-#也可以
-
-file(GLOB DIR_SRCS *.c)
-
-add_executable(main ${DIR_SRCS})
-
-如果在cmake中需要使用其他目录的cmakelist
-
-
-cmake_minimum_required (VERSION 3.6.0)
-
-project (Main)
-
-aux_source_directory(. DIR_SRCS)
-
-# 添加 child 子目录下的cmakelist
-
+# 添加child子目录下的cmakelist
 add_subdirectory(child)
 
-# 指定生成目标
-
-add_executable(main ${DIR_SRCS})
-
-# 添加链接库
-
-target_link_libraries(main child)
-
-#===========================================================================================
-
-#child目录下的cmake就是：
-
-cmake_minimum_required (VERSION 3.6.0)
-
+add_library(
+     native-lib
+     SHARED
+     ${DIR_SRCS})
+ target_link_libraries(native child)
+#--------------------------------
+#child目录下的CMakeLists.txt
+cmake_minimum_required(VERSION 3.6.0)
+# 查找当前目录所有源文件 并将名称保存到 DIR_SRCS变量
+# 不能查找子目录
 aux_source_directory(. DIR_LIB_SRCS)
-
-# 生成链接库 默认生成静态库
-
-add_library (child ${DIR_LIB_SRCS})
-
-#指定编译为静态库
-
-add_library (child STATIC ${DIR_LIB_SRCS})
-
-#指定编译为动态库
-
-add_library (child SHARED ${DIR_LIB_SRCS})
-
-在上面的例子中都是生成可执行文件，让我们对cmakelist有了一定的了解。现在到android studio中使用cmakelist
-
-
-#NDK中已经有一部分预构建库 ndk库已经是被配置为cmake搜索路径的一部分 所以可以
-
-findLibrary(log-lib log)
-
-target_link_libraries( native-lib
-
-                      ${log-lib} )
-
-#设置cflag和cxxflag
-
-#定义预编译宏：TEST
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTEST"  )
-
-set(CMAKE_Cxx_FLAGS "${CMAKE_Cxx_FLAGS} -DTEST"  )                     
-
-#其实直接这样就行
-
-target_link_libraries( native-lib
-
-                      log )
-
-添加其他预编译库(已经提前编译好的库)
-
-
-#使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中
-
+add_library(
+     native-lib
+     SHARED
+     ${DIR_LIB_SRCS})
+```
+### 添加与编译库（Android6.0版本以前）
+- 假如我们本地项目引用了libhello-jni.so。
+- 添加add_library命令，第一个参数是模块名，第二个参数SHARED表示动态库，STARIC表示静态库，第三个参数IMPORTED表示以打入的形式添加
+- 添加set_target_properties命令设置打入路径属性。
+- 将import-lib添加到target_link_libraries命令参数中，native-lib需要链接到libhello-jni.so模块
+```
+#cmake最低版本
+cmake_minimum_required(VERSION 3.6.0)
+#使用IMPORTED标志告知 CMake只希望将库导入到项目中
 #如果是静态库则将shared改为static
-
-add_library( imported-lib
-
-            SHARED
-
-            IMPORTED )
-
-# 参数分别为：库、属性、导入地址、so所在地址
-
+add_library(
+     libhello-jni.so
+     SHARED
+     IMPORTED)
+#参数分别为：库、属性、导入地址、库所在的地址
 set_target_properties(
-
-                      imported-lib
-
-                      PROPERTIES
-
-                      IMPORTED_LOCATION
-
-                      ${CMAKE_SOURCE_DIR}/src/${ANDROID_ABI}/libimported-lib.so )
-
-#为了确保 CMake 可以在编译时定位头文件
-
-#这样就可以使用 #include <xx> 引入
-
-#否则需要使用 #include "path/xx"
-
-include_directories( imported-lib/include/ )
-
-#native-lib 是自己编写的源码最终要编译出的so库
-
-target_link_libraries(native-lib imported-lib)
-
-#===========================================================================================
-
-#添加其他预编译库还可以使用这种方式
-
-#使用-L指导编译时库文件的查找路径
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Lxx")
-
-#为了确保 CMake 可以在编译时定位您的标头文件
-
-include_directories( imported-lib/include/ )
-
-#native-lib 是自己编写的源码最终要编译出的so库
-
-target_link_libraries(native-lib imported-lib)
-
-常用指令：
-
-
-#set命令表示声明一个变量source 变量的值是后面的可变参数
-
-set（source a b c）
-
-message(${source})
-
-#逻辑判断 计较字符串
-
-set(ANDROID_ABI "areambi-v7a")
-
-if(${ANDROID_ABI} STREQUAL "areambi")
-
-  message("armv5")
-
-elseif(${ANDROID_ABI} STREQUAL "areambi-v7a")
-
-message("armv7a")
-
-else()
-
-endif()
-
-
-//还可以在gradle中使用 arguments  设置一些配置
-
-externalNativeBuild {
-
-      cmake {
-
-        arguments "-DANDROID_TOOLCHAIN=clang",  //使用的编译器clang/gcc
-
-                  "-DANDROID_STL=gnustl_static" //cmake默认就是 gnustl_static
-
-        cFlags "" //这里也可以指定cflag和cxxflag,效果和之前的cmakelist里使用一样
-
-        cppFlags ""
-
-      }
-
+                libhello-jni.so
+                PROPERTIES
+                IMPORTED_LOCATION
+                <路径>/libhello-jni.so)
+ aux_source_directory(. DIR_SRCS) 
+ add_library(
+     native-lib
+     SHARED
+     ${DIR_SRCS})
+ target_link_libraries(native-lib libhello-jni)
+```
+### 添加编译库（Android6.0版本以后）
+- 在Android6.0及以上版本，如果使用上节的方法添加预编译动态库的话，会有问题。我们可以使用另外一种方式来配置。
+```
+#set命令定义一个变量
+#CMAKE_C_FLAGS:c的参数，会传递给编译器
+#-L：库的查找路径
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" -L[so所在目录])
+```
+### 添加头文件目录
+- 为了确保CMake可以在编译时定位头文件，使用include_directories,相当于g++选项中的-l参数。这样就可以使用#include "xx.h"否则需要使用#include “path/xx.h”
+```
+#cmake最低版本
+cmake_minimum_required(VERSION 3.6.0)
+#设置头文件目录
+include_directories(<文件目录>)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/../../../libs/${ANDROID_ABI}")
+aux_source_directory(. DIR_SRCS) 
+add_library(
+     native-lib
+     SHARED
+     ${DIR_SRCS})
+ target_link_libraries(native libhello-jni)
+```
+### Build.gradle配置
+```
+android {
+   
+    defaultConfig {
+        
+        externalNativeBuild {
+            cmake {
+                //使用的编译器clang/gcc
+                //cmake默认就是gnustl_static
+                arguments "DANDROID_TOOLCAAIN=clang","-DANDROID_STL=gnustl_static"
+                //指定cflags和cppflags，效果和cmakelist使用一样
+                cppFlags ""
+                cFlags “”
+                //指定需要编译的cpu架构
+                abiFilters 'arm64-v8a', "x86", "armeabi-v7a", "x86_64"
+            }
+        }
+    }
+    //指定库的位置
+    sourceSets {
+        main {
+            jniLibs.srcDirs(['libs'])
+        }
+    }
+   
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+        }
     }
 
-5.0及以下与6.0及以上的注意事项：
+}
 
-​ 存在两个动态库libhello-jni.so 与 libTest.so。
-
-libhello-jni.so依赖于libTest.so (使用NDK下的ndk-depends可查看依赖关系)，则：
-
-
-//<=5.0:
-
-System.loadLibrary("Test");
-
-System.loadLibrary("hello-jni");
-
-//>=6.0:
-
-System.loadLibrary("hello-jni");
-
-Android.mk
-
-​ 使用Android.mk在 >=6.0 设备上不能再使用预编译动态库(静态库没问题)：
-
-
-LOCAL_PATH := $(call my-dir)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := Test
-
-#libTest.so放在当前文件同目录
-
-LOCAL_SRC_FILES := libTest.so
-
-#预编译库
-
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-
-#引入上面的Test模块
-
-LOCAL_SHARED_LIBRARIES := Test
-
-LOCAL_MODULE := hello-jni
-
-LOCAL_SRC_FILES := hello-jni.c
-
-include $(BUILD_SHARED_LIBRARY)
-
-上面这段配置生成的libhllo-jni在>=6.0设备中无法执行。
-
-CMake
-
-​ 使用CMakeList.txt在 >=6.0 设备上引入预编译动态库:
-
-
-cmake_minimum_required(VERSION 3.4.1)
-
-file(GLOB SOURCE *.c )
-
-add_library(
-
-            hello-jni
-
-            SHARED
-
-            ${SOURCE} )
-
-#这段配置在6.0依然没问题
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
-
-#这段配置只能在6.0以下使用 原因和android.mk一样
-
-#add_library(Test SHARED IMPORTED)
-
-#set_target_properties(Test PROPERTIES IMPORTED_LOCATION [SO绝对地址])
-
-target_link_libraries(  hello-jni Test )
-
-注意事项
-
-​ 从6.0开始 使用Android.mk 如果来引入一个预编译动态库 有问题
-
-在4.4上 如果load一个动态库 ，需要先将这个动态库的依赖的其他动态库load进来
-
-在6.0以下 System.loadLibrary 不会自动为我们加载依赖的动态库
-
-6.0以上 System.loadLibrary 会自动为我们加载依赖的动态库
+```
 
 目前 Android Studio 默认支持的 CMake 最新版本是 3.10.2，但是这个版本 message 输出根本看不到。记得之前 3.6.x 版本中 build 之后还是可以看到的，这篇文章主要说下 message() 的使用和日志输出位置。
 
